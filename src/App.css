@@ -1,0 +1,14 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.task-input {
+  display: flex;
+  gap: 8px;
+}
+
+.task-list {
+  margin-top: 16px;
+}
