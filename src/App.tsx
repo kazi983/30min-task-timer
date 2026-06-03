@@ -2,43 +2,34 @@ import { useState } from 'react';
 import { TaskService } from './services/TaskService';
 import TaskPickerView from './views/TaskPickerView';
 import TaskManagementView from './views/TaskManagementView';
-import type { Priority } from './models/Task';
+import type { AddTaskInput, UpdateTaskInput } from './models/Task';
 
 const taskService = new TaskService();
 
 function App() {
+  const refreshTasks = () => taskService.getTasks({ deleted: false, completed: false });
+
   const [screen, setScreen] = useState<'picker' | 'management'>('picker');
-  const [tasks, setTasks] = useState(taskService.getIncompleteTasks());
+  const [tasks, setTasks] = useState(refreshTasks());
 
-  type NewTask = {
-    name: string;
-    priority: string;
-    memo: string;
-  };
-  const addTask = (data: NewTask) => {
-    taskService.addTask(data.name, data.priority as Priority, data.memo);
-    setTasks(taskService.getIncompleteTasks());
+  const addTask = (data: AddTaskInput) => {
+    taskService.addTask(data);
+    setTasks(refreshTasks());
   };
 
-  type EditTask = {
-    name: string;
-    priority: string;
-    memo: string;
-  };
-  const updateTask = (id: string, data: EditTask) => {
-    console.log(data);
-    taskService.updateTask(id, data.name, data.priority as Priority, data.memo);
-    setTasks(taskService.getIncompleteTasks());
+  const updateTask = (id: string, data: UpdateTaskInput) => {
+    taskService.updateTask(id, data);
+    setTasks(refreshTasks());
   };
 
   const completeTask = (id: string) => {
     taskService.completeTask(id);
-    setTasks(taskService.getIncompleteTasks());
+    setTasks(refreshTasks());
   };
 
   const deleteTask = (id: string) => {
     taskService.deleteTask(id);
-    setTasks(taskService.getIncompleteTasks());
+    setTasks(refreshTasks());
   };
 
   if (screen === 'management') {
@@ -49,7 +40,7 @@ function App() {
         onAddTask={addTask}
         onDeleteTask={deleteTask}
         onCompleteTask={completeTask}
-        onEditTask={updateTask}
+        onUpdateTask={updateTask}
       />
     );
   }

@@ -1,4 +1,4 @@
-export type Priority = 'NOW' | 'SOONER' | 'ANYTIME';
+export type Priority = 'NOW' | 'SOONER' | 'ANYTIME' | 'SOMEDAY';
 
 export type Task = {
   id: string;
@@ -9,4 +9,16 @@ export type Task = {
   createdAt: string;
   lastSelected: boolean;
   deleted: boolean;
+};
+
+export type AddTaskInput = {
+  name: string;
+  priority: Priority;
+  memo: string;
+};
+
+export type UpdateTaskInput = {
+  name: string;
+  priority: Priority;
+  memo: string;
 };

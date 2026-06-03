@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import type { Task } from '../models/Task';
+import type { Task, AddTaskInput } from '../models/Task';
 
 type Props = {
   tasks: Task[];
-  onAddTask: (data: { name: string; priority: string; memo: string }) => void;
+  onAddTask: (data: AddTaskInput) => void;
   onStartTask: (task: Task) => void;
   onSnooze: () => void;
   onOpenManagement: () => void;

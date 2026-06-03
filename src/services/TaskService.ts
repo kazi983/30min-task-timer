@@ -1,34 +1,48 @@
-import type { Task, Priority } from '../models/Task';
+import type { Task, AddTaskInput, UpdateTaskInput } from '../models/Task';
 
 const STORAGE_KEY = 'tasks';
 
 export class TaskService {
-  getAllTasks(): Task[] {
-    return this.loadTasks();
+  getTasks(filter: {
+    deleted?: boolean;
+    completed?: boolean;
+    lastSelected?: boolean;
+  }): Task[] {
+    const tasks = this.loadTasks();
+
+    return tasks.filter((task) => {
+      if (filter.deleted !== undefined && task.deleted !== filter.deleted) {
+        return false;
+      }
+
+      if (filter.completed !== undefined && task.completed !== filter.completed) {
+        return false;
+      }
+
+      if (
+        filter.lastSelected !== undefined &&
+        task.lastSelected !== filter.lastSelected
+      ) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
-  getIncompleteTasks(): Task[] {
-    return this.loadTasks().filter((task) => !task.completed);
-  }
-
-  getLastSelectedTasks(): Task[] {
-    return this.loadTasks().filter((task) => task.lastSelected);
-  }
-
-  addTask(name: string, priority: Priority, memo: string = ''): Task {
-    if (!name.trim()) {
+  addTask(data: AddTaskInput): Task {
+    if (!data.name.trim()) {
       throw new Error('タスク名が空です');
     }
-    console.log('name :>> ', name);
 
     const tasks = this.loadTasks();
 
     const task: Task = {
       id: crypto.randomUUID(),
-      name,
-      memo,
+      name: data.name.trim(),
+      memo: data.memo,
       completed: false,
-      priority,
+      priority: data.priority,
       createdAt: new Date().toISOString(),
       lastSelected: false,
       deleted: false,
@@ -41,22 +55,23 @@ export class TaskService {
     return task;
   }
 
-  updateTask(taskId: string, name: string, priority: Priority, memo: string = '') {
-    console.log('name :>> ', name);
+  updateTask(taskId: string, data: UpdateTaskInput) {
+    if (!data.name.trim()) {
+      throw new Error('タスク名が空です');
+    }
 
     const tasks = this.loadTasks();
 
     const task = tasks.find((task) => task.id === taskId);
 
     if (!task) {
-      return;
+      throw new Error('Task not found');
     }
 
-    task.name = name;
-    task.priority = priority;
-    task.memo = memo;
+    task.name = data.name.trim();
+    task.priority = data.priority;
+    task.memo = data.memo;
 
-    console.log('saving..');
     this.saveTasks(tasks);
   }
 
@@ -92,14 +107,8 @@ export class TaskService {
     const tasks = this.loadTasks();
 
     tasks.forEach((task) => {
-      task.lastSelected = false;
+      task.lastSelected = task.id === taskId;
     });
-
-    const task = tasks.find((task) => task.id === taskId);
-
-    if (task) {
-      task.lastSelected = true;
-    }
 
     this.saveTasks(tasks);
   }
@@ -112,16 +121,27 @@ export class TaskService {
     }
 
     try {
-      const tasks = JSON.parse(json) as Task[];
-
-      return tasks.filter((task) => !task.deleted);
+      const raw = JSON.parse(json) as Task[];
+      return raw.map(this.normalizeTask);
     } catch {
       return [];
     }
   }
 
   private saveTasks(tasks: Task[]) {
-    console.log('saving...');
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  }
+
+  private normalizeTask(task: any): Task {
+    return {
+      id: task.id,
+      name: task.name ?? '',
+      memo: task.memo ?? '',
+      priority: task.priority,
+      completed: Boolean(task.completed),
+      deleted: Boolean(task.deleted),
+      lastSelected: Boolean(task.lastSelected),
+      createdAt: task.createdAt ?? new Date().toISOString(),
+    };
   }
 }

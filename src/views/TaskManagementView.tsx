@@ -1,21 +1,12 @@
 import { useState } from 'react';
-import type { Task } from '../models/Task';
+import type { Task, AddTaskInput, UpdateTaskInput, Priority } from '../models/Task';
 
 type Props = {
   tasks: Task[];
-
-  onAddTask: (data: { name: string; priority: string; memo: string }) => void;
-
+  onAddTask: (data: AddTaskInput) => void;
   onCompleteTask: (id: string) => void;
   onDeleteTask: (id: string) => void;
-  onEditTask: (
-    id: string,
-    data: {
-      name: string;
-      priority: string;
-      memo: string;
-    },
-  ) => void;
+  onUpdateTask: (id: string, data: UpdateTaskInput) => void;
 
   onBack: () => void;
 };
@@ -25,13 +16,13 @@ export default function TaskManagementView({
   onAddTask: onAddTask,
   onCompleteTask: onCompleteTask,
   onDeleteTask: onDeleteTask,
-  onEditTask: onEditTask,
+  onUpdateTask: onUpdateTask,
   onBack,
 }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [name, setName] = useState('');
-  const [priority, setPriority] = useState('NOW');
+  const [priority, setPriority] = useState<Priority>('NOW');
   const [memo, setMemo] = useState('');
 
   const selectedTask = tasks.find((t) => t.id === selectedId);
@@ -60,7 +51,7 @@ export default function TaskManagementView({
   const handleUpdateButtonClick = () => {
     if (!selectedTask) return;
 
-    onEditTask(selectedTask.id, {
+    onUpdateTask(selectedTask.id, {
       name,
       priority,
       memo,
@@ -118,7 +109,10 @@ export default function TaskManagementView({
           placeholder="task name"
         />
 
-        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value as Priority)}
+        >
           <option value="NOW">NOW</option>
           <option value="SOONER">SOONER</option>
           <option value="ANYTIME">ANYTIME</option>
