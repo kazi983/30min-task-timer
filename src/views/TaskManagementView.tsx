@@ -6,10 +6,10 @@ type Props = {
 
   onAddTask: (data: { name: string; priority: string; memo: string }) => void;
 
-  onCompleteTask: (task: Task) => void;
-  onDeleteTask: (task: Task) => void;
+  onCompleteTask: (id: string) => void;
+  onDeleteTask: (id: string) => void;
   onEditTask: (
-    task: Task,
+    id: string,
     data: {
       name: string;
       priority: string;
@@ -25,7 +25,7 @@ export default function TaskManagementView({
   onAddTask: onAddTask,
   onCompleteTask: onCompleteTask,
   onDeleteTask: onDeleteTask,
-  onEditTask: onEdit,
+  onEditTask: onEditTask,
   onBack,
 }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export default function TaskManagementView({
     setMemo(task.memo);
   };
 
-  const handleAddTask = () => {
+  const handleAddButtonClick = () => {
     if (!name.trim()) return;
 
     onAddTask({
@@ -57,10 +57,10 @@ export default function TaskManagementView({
     setPriority('NOW');
   };
 
-  const handleEditTask = () => {
+  const handleUpdateButtonClick = () => {
     if (!selectedTask) return;
 
-    onEdit(selectedTask, {
+    onEditTask(selectedTask.id, {
       name,
       priority,
       memo,
@@ -139,13 +139,17 @@ export default function TaskManagementView({
           gap: 8,
         }}
       >
-        <button onClick={handleAddTask}>＋ 新規登録</button>
+        <button onClick={handleAddButtonClick}>＋ 新規登録</button>
 
-        <button onClick={() => selectedTask && onCompleteTask(selectedTask)}>完了</button>
+        <button onClick={() => selectedTask && onCompleteTask(selectedTask.id)}>
+          完了
+        </button>
 
-        <button onClick={() => selectedTask && onDeleteTask(selectedTask)}>削除</button>
+        <button onClick={() => selectedTask && onDeleteTask(selectedTask.id)}>
+          削除
+        </button>
 
-        <button onClick={handleEditTask}>更新</button>
+        <button onClick={handleUpdateButtonClick}>更新</button>
 
         <button onClick={onBack}>戻る</button>
       </div>

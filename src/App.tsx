@@ -15,36 +15,29 @@ function App() {
     priority: string;
     memo: string;
   };
-  const handleAddTask = (data: NewTask) => {
+  const addTask = (data: NewTask) => {
     taskService.addTask(data.name, data.priority as Priority, data.memo);
     setTasks(taskService.getIncompleteTasks());
   };
 
   type EditTask = {
-    id: string;
     name: string;
     priority: string;
     memo: string;
   };
-  const handleEditTask = (data: EditTask) => {
+  const updateTask = (id: string, data: EditTask) => {
     console.log(data);
-    taskService.editTask(data.id, data.name, data.priority as Priority, data.memo);
+    taskService.updateTask(id, data.name, data.priority as Priority, data.memo);
     setTasks(taskService.getIncompleteTasks());
   };
 
-  type CompleteTask = {
-    id: string;
-  };
-  const handleCompleteTask = (data: CompleteTask) => {
-    taskService.markTaskAsComplete(data.id);
+  const completeTask = (id: string) => {
+    taskService.completeTask(id);
     setTasks(taskService.getIncompleteTasks());
   };
 
-  type DeleteTask = {
-    id: string;
-  };
-  const handleDeleteTask = (data: DeleteTask) => {
-    taskService.markTaskAsDelete(data.id);
+  const deleteTask = (id: string) => {
+    taskService.deleteTask(id);
     setTasks(taskService.getIncompleteTasks());
   };
 
@@ -53,17 +46,17 @@ function App() {
       <TaskManagementView
         tasks={tasks}
         onBack={() => setScreen('picker')}
-        onAddTask={handleAddTask}
-        onDeleteTask={handleDeleteTask}
-        onCompleteTask={handleCompleteTask}
-        onEditTask={handleEditTask}
+        onAddTask={addTask}
+        onDeleteTask={deleteTask}
+        onCompleteTask={completeTask}
+        onEditTask={updateTask}
       />
     );
   }
   return (
     <TaskPickerView
       tasks={tasks}
-      onAddTask={handleAddTask}
+      onAddTask={addTask}
       onStartTask={() => {}}
       onSnooze={() => {}}
       onOpenManagement={() => setScreen('management')}

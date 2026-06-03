@@ -41,7 +41,7 @@ export class TaskService {
     return task;
   }
 
-  editTask(taskId: string, name: string, priority: Priority, memo: string = '') {
+  updateTask(taskId: string, name: string, priority: Priority, memo: string = '') {
     console.log('name :>> ', name);
 
     const tasks = this.loadTasks();
@@ -60,7 +60,7 @@ export class TaskService {
     this.saveTasks(tasks);
   }
 
-  markTaskAsComplete(taskId: string) {
+  completeTask(taskId: string) {
     const tasks = this.loadTasks();
 
     const task = tasks.find((task) => task.id === taskId);
@@ -74,7 +74,7 @@ export class TaskService {
     this.saveTasks(tasks);
   }
 
-  markTaskAsDelete(taskId: string) {
+  deleteTask(taskId: string) {
     const tasks = this.loadTasks();
 
     const task = tasks.find((task) => task.id === taskId);
@@ -88,7 +88,7 @@ export class TaskService {
     this.saveTasks(tasks);
   }
 
-  markTaskAsLastSelected(taskId: string) {
+  setLastSelectedTask(taskId: string) {
     const tasks = this.loadTasks();
 
     tasks.forEach((task) => {
